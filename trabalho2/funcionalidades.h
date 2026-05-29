@@ -1,6 +1,7 @@
 #pragma once
 
-    #include "structs.h"
+    #include "header.h"
+    #include "registro.h"
     #include "arquivosLerEscrever.h"
     #include "utils.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-    #include "structs.h"
-
+    #include "header.h"
+    #include "registro.h"
 
     typedef struct CriterioBusca {
         char nomeDoCampo[100];

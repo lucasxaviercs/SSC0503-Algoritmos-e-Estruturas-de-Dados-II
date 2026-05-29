@@ -5,19 +5,7 @@
     #include <string.h>
     #include <ctype.h>
 
-    #define TAM_CABECALHO 17
     #define TAM_REGISTRO 80
-    #define TAM_INDEX_HEADER 1
-    #define TAM_INDEX_REGISTRO 8
-
-
-    typedef struct {
-        char status; // indica se o arquivo está consistente ('1') ou inconsistente ('0')
-        int topo; // armazena o RRN de um registro logicamente removido ou '-1' caso não haja nenhum registro logicamente removido
-        int proxRRN; // próximo RRN disponível
-        int nroEstacoes; // indica a quantidade de estações diferentes no arquivo de dados
-        int nroParesEstacao; // indica a quantidade de pares (codEstacao, codProxEstacao) 
-    } Header;
 
     typedef struct {
         char removido; // indica se o registro foi logicamente removido ou não
@@ -33,12 +21,3 @@
         int tamNomeLinha; // tamanho do campo nomeLinha
         char *nomeLinha; // nome da linha
     } Registro;
-
-    typedef struct {
-        char status; // indica a consistência do arquivo de dados
-    } IndexHeader;
-
-    typedef struct {
-        int codEstacao; // código único que identifica a estação
-        int RRN; // RRN do registro correspondente ao código da estação
-    } IndexRegistro;
