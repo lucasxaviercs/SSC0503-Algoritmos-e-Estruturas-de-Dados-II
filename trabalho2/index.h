@@ -16,3 +16,8 @@
         int codEstacao; // código único que identifica a estação
         int RRN; // RRN do registro correspondente ao código da estação
     } IndexRegistro;
+
+    void CriarIndex(FILE *arquivoDados, FILE* arquivoIndex);
+    int BuscarRegistroIndex(FILE *arquivoIndex, int codEstacao);
+    void InserirRegistroIndex(FILE *arquivoIndex, int codEstacao, int RRN);
+    void RemoverRegistroIndex(FILE *arquivoIndex, int codEstacao);
