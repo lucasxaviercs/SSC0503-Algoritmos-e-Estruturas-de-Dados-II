@@ -17,9 +17,6 @@
         int RRN; // RRN do registro correspondente ao código da estação
     } IndexRegistro;
 
-    // cria o arquivo de índice a partir do arquivo de dados, usando codEstacao para indexar
-    void CriarIndex(FILE *arquivoDados, FILE* arquivoIndex);
-
     // carrega o arquivo de índice em memória primária para uso
     void CarregarIndex(FILE *arquivoIndex, IndexRegistro **registros, int *totalRegs);
     // reescreve o arquivo de índice no disco após operações

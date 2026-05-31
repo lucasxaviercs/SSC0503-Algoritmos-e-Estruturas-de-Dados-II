@@ -270,3 +270,58 @@ void RecuperacaoRRN(char *arquivoEntrada, int RRN){
     LiberarStringRegistro(&registroDados);
     fclose(arquivoBIN);
 }
+
+void CriarIndex(FILE *arquivoDados, FILE* arquivoIndex){
+    // abre o arquivo de dados para leitura, se deu erro aborta
+    FILE *arquivoDadosBIN = fopen(arquivoDados, "rb");
+    if (arquivoDadosBIN == NULL) {
+        mensagemErro();
+        return;
+    }
+
+    // verifica a consistência do arquivo de dados, se tiver inconsistente aborta
+    Header cabecalhoDados;
+    LerCabecalhoBIN(arquivoDadosBIN, &cabecalhoDados);
+    if (cabecalhoDados.status == '0'){
+        MensagemErro();
+        fclose(arquivoDadosBIN);
+        return;
+    }
+
+    // abre o arquivo de índice para escrita, se deu erro aborta
+    FILE *arquivoIndexBIN = fopen(arquivoIndex, "wb+");
+    if (arquivoIndexBIN == NULL) {
+        mensagemErro();
+        fclose(arquivoDadosBIN);
+        return;
+    }
+
+    // marca como inconsistente durante o processo de criação do índice
+    IndexHeader cabecalhoIndex;
+    cabecalhoIndex.status = '0';
+    fwrite(&cabecalhoIndex, sizeof(IndexHeader), 1, arquivoIndexBIN);
+
+    // cria um array para armazenar os registros do índice conforme lê o arquivo de dados
+    // ao final, o arquivo de índice será construído reutilizando a função de reescrita que coloca o índice da RAM para o disco
+    IndexRegistro *registros = NULL;
+    int totalRegsIndex = 0;
+    Registro regDados;
+
+    fseek(arquivoDadosBIN, TAM_CABECALHO, SEEK_SET);
+
+    for (int i = 0; i < cabecalhoDados.proxRRN; i++) {
+        LerRegistroBIN(arquivoDadosBIN, &regDados);
+
+        if (regDados.removido != '1') {
+            InserirRegistroIndex(arquivoIndexBIN, regDados.codEstacao, i, &totalRegsIndex);
+        }
+
+        LiberarStringRegistro(&regDados);
+    }
+
+    ReescritaIndex(arquivoIndexBIN, registros, totalRegsIndex);
+
+    free(registros);
+    fclose(arquivoDadosBIN);
+    fclose(arquivoIndexBIN);
+}

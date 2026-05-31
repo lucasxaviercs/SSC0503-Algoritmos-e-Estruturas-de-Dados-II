@@ -2,6 +2,7 @@
 
     #include "header.h"
     #include "registro.h"
+    #include "index.h"
     #include "ioDados.h"
     #include "utils.h"
 
@@ -20,3 +21,6 @@
     void SelectFrom(char *arquivoEntrada);
     void SelectWhere(char *arquivoEntrada, int nroBuscas);
     void RecuperacaoRRN(char *arquivoEntrada, int RRN);
+    
+    // cria o arquivo de índice a partir do arquivo de dados, usando codEstacao para indexar
+    void CriarIndex(FILE *arquivoDados, FILE* arquivoIndex);
