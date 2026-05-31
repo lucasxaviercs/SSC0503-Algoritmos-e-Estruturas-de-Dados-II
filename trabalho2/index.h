@@ -24,7 +24,7 @@
 
     // operações de busca, inserção e remoção no índice
     int BuscarRegistroIndex(FILE *arquivoIndex, int codEstacao);
-    void InserirRegistroIndex(FILE *arquivoIndex, int codEstacao, int RRN);
+    void InserirRegistroIndex(IndexRegistro **registros, int codEstacao, int RRN, int *totalRegs);
     void RemoverRegistroIndex(FILE *arquivoIndex, int codEstacao);
 
     // função auxiliar para ler um registro do arquivo de índices para struct

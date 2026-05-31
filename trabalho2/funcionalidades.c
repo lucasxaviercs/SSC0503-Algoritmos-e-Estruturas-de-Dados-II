@@ -313,7 +313,7 @@ void CriarIndex(FILE *arquivoDados, FILE* arquivoIndex){
         LerRegistroBIN(arquivoDadosBIN, &regDados);
 
         if (regDados.removido != '1') {
-            InserirRegistroIndex(arquivoIndexBIN, regDados.codEstacao, i, &totalRegsIndex);
+            InserirRegistroIndex(&registros, regDados.codEstacao, i, &totalRegsIndex);
         }
 
         LiberarStringRegistro(&regDados);
@@ -324,4 +324,142 @@ void CriarIndex(FILE *arquivoDados, FILE* arquivoIndex){
     free(registros);
     fclose(arquivoDadosBIN);
     fclose(arquivoIndexBIN);
+}
+
+void InsertInto(char *arquivoDados, char *arquivoIndex, int nroInsercoes){
+
+    FILE *arquivoDadosBIN = fopen(arquivoDados, "rb+");
+    if (arquivoDadosBIN == NULL) {
+        mensagemErro();
+        return;
+    }
+
+    FILE *arquivoIndexBIN = fopen(arquivoIndex, "rb+");
+    if (arquivoIndexBIN == NULL) {
+        mensagemErro();
+        return;
+    }
+
+    Header cabecalho;
+    LerCabecalhoBIN(arquivoDadosBIN, &cabecalho);
+    if (cabecalho.status == '0') {
+        MensagemErro();
+        fclose(arquivoDadosBIN);
+        fclose(arquivoIndexBIN);
+        return;
+    }
+
+    // marcar como inconsistente
+    IndexHeader cabecalhoIndex;
+    cabecalhoIndex.status = '0';
+    fwrite(&cabecalhoIndex, sizeof(IndexHeader), 1, arquivoIndexBIN);
+
+    cabecalho.status = '0';
+    EscreverCabecalhoBIN(arquivoDadosBIN, &cabecalho);
+
+    // carregar index em RAM
+    IndexRegistro *registrosIndex = NULL;
+    int totalRegs = 0;
+    CarregarIndex(arquivoIndexBIN, &registrosIndex, &totalRegs);
+
+    for(int i = 0; i < nroInsercoes; i++){
+
+        Registro novoRegistro;
+        novo.removido = '0';
+        novo.proximo = -1;
+
+        scanf("%d", &novo.codEstacao);
+
+        char bufferLeitura[100]; // buffer para armazenar as leituras feitas com ScanQuoteString
+
+        ScanQuoteString(bufferLeitura);
+        if (bufStr[0] == '\0'){
+            novo.nomeEstacao = NULL;
+            novo.tamNomeEstacao = 0;
+        } else {
+            novo.nomeEstacao = strdup(bufferLeitura);
+            novo.tamNomeEstacao = strlen(bufferLeitura);
+        }
+
+        scanf("%d", &novo.codLinha);
+
+        ScanQuoteString(bufferLeitura);
+        if (bufStr[0] == '\0'){
+            novo.nomeLinha = NULL;
+            novo.tamNomeLinha = 0;
+        } else {
+            novo.nomeLinha = strdup(bufferLeitura);
+            novo.tamNomeLinha = strlen(bufferLeitura);
+        }
+
+        // Campos numéricos que podem ser nulo
+        scanf("%s", bufferLeitura);
+        if (strcmp(bufferLeitura, "NULO") == 0) {
+            novo.codProxEstacao = -1;
+        } else {
+            novo.codProxEstacao = atoi(bufferLeitura);
+        }
+
+        scanf("%s", bufferLeitura);
+        if (strcmp(bufferLeitura, "NULO") == 0) {
+            novo.distProxEstacao = -1;
+        } else {
+            novo.distProxEstacao = atoi(bufferLeitura);
+        }
+
+        scanf("%s", bufferLeitura);
+        if (strcmp(bufferLeitura, "NULO") == 0) {
+            novo.codLinhaIntegra = -1;
+        } else {
+            novo.codLinhaIntegra = atoi(bufferLeitura);
+        }
+
+        scanf("%s", bufferLeitura);
+        if (strcmp(bufferLeitura, "NULO") == 0) {
+            novo.codEstIntegra = -1;
+        } else {
+            novo.codEstIntegra = atoi(bufferLeitura);
+        }
+
+        int rrnNovoRegistro;
+        if (cabecalho.topo != -1) {
+            rrnNovoRegistro = cabecalho.topo;
+
+            int byteoffset = TAM_CABECALHO + (rrnNovoRegistro * TAM_REGISTRO);
+            fseek(arquivoDadosBIN, byteoffset, SEEK_SET);
+
+            Registro removido;
+            removido.nomeEstacao = NULL;
+            removido.nomeLinha = NULL;
+            LerRegistroBIN(arquivoDadosBIN, &removido);
+
+            cabecalho.topo = removido.proximo; // atualiza o topo com o último removido da pilha de removidos
+            LiberarStringRegistro(&removido);
+        } else {
+            rrnNovoRegistro = cabecalho.proxRRN;
+            cabecalho.proxRRN++;
+        }
+
+        int byteoffset = TAM_CABECALHO + (rrnNovoRegistro * TAM_REGISTRO);
+        fseek(arquivoDadosBIN, byteoffset, SEEK_SET);
+        EscreverRegistroBIN(arquivoDadosBIN, &novo);
+
+        InserirRegistroIndex(&registrosIndex, novo.codEstacao, rrnNovoRegistro, &totalRegs);
+        LiberarStringRegistro(&novo);
+    }
+
+    ReescritaIndex(arquivoIndexBIN, registrosIndex, totalRegs);
+    free(registrosIndex);
+
+    // reescreve o cabecalho dos arquivos marcando como consistente ao final da inserção
+    cabecalhoIndex.status = '1';
+    fwrite(&cabecalhoIndex, sizeof(IndexHeader), 1, arquivoIndexBIN);
+    cabecalho.status = '1';
+    EscreverCabecalhoBIN(arquivoDadosBIN, &cabecalho);   
+    
+    fclose(arquivoDadosBIN);
+    fclose(arquivoIndexBIN);
+
+    BinarioNaTela(arquivoDados);
+    BinarioNaTela(arquivoIndex); 
 }

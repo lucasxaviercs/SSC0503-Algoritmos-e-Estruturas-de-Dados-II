@@ -48,6 +48,9 @@ int main(int argc, char *argv[]){
             break;
 
         case INSERT_INTO:
+            int nroInsercoes;
+            scanf("%s %s %d", arquivoEntrada, arquivoSaida, &nroInsercoes);
+            InsertInto(arquivoEntrada, arquivoSaida, nroInsercoes);
             break;
 
         case UPDATE:

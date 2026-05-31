@@ -24,3 +24,6 @@
     
     // cria o arquivo de índice a partir do arquivo de dados, usando codEstacao para indexar
     void CriarIndex(FILE *arquivoDados, FILE* arquivoIndex);
+
+    void InsertInto(char *arquivoDados, char *arquivoIndex, int nroInsercoes);
+    
