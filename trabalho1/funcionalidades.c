@@ -170,60 +170,12 @@ void SelectWhere(char *arquivoEntrada, int nroBuscas){
         // Lemos os critérios de busca passados (FILTRO PASSADOS)
         LerCriteriosBusca(criterios, m_nroCriterios);
 
-        // Verificamos se a busca atual contém o campo codEstacao
-        int buscaID = 0;
-        for(int c = 0; c < m_nroCriterios; c++){
-            if(strcmp(criterios[c].nomeDoCampo, "codEstacao") == 0){
-                buscaID = 1;
-                break;
-            }
-        }
-
-        // Posicionamos o ponteiro do arquivo para o início dos dados (IGNORANDO O CABEÇALHO = 17 Bytes)
-        fseek(arquivoBIN, TAM_CABECALHO, SEEK_SET);
-
-        Registro registroDados;
-        int registroEncontrado = 0; // Flag de controle ( 0 = false, 1 = true)
-
-        for(int rrnAtual = 0; rrnAtual < cabecalho.proxRRN; rrnAtual++){
-            // "Zera" os ponteiros para prevenir lixo da memoria na leitura
-            registroDados.nomeEstacao = NULL;
-            registroDados.nomeLinha = NULL;
-
-            // Preenche a struct com os dados lido do arquvio e verifica se não está removido
-            LerRegistroBIN(arquivoBIN, &registroDados);
-            
-            // Ignoramos todos os registros inválidos
-            if(registroDados.removido != '1'){ // apenas uma segurança a mais para confirmar que NÃO ESTÁ REMOVIDO
-                int atendeTodosCriterios = 1; // Assumimos que registro serve (true), até que se prove o contrário
-
-                // Verifica o registro atual a partir dos criterios de busca que foram passados
-                for(int criterioAtual = 0; criterioAtual < m_nroCriterios; criterioAtual++){
-                    // Retornaremos 1 se o campo atende ao critério buscado
-                    if(VerificaCriterioBusca(&registroDados, criterios[criterioAtual].nomeDoCampo, criterios[criterioAtual].valorBuscado) != 1){
-                        atendeTodosCriterios = 0; // Falhou em dos pares de criterios (filtro) passados
-                        break; // Descartamos
-                    }
-                }
-                
-                // Se passou pelas verificações, imprimimos na tela
-                if(atendeTodosCriterios == 1){
-                    ImprimirRegistro(&registroDados);
-                    registroEncontrado = 1; // Sinalizamos que encontramos um que atende ao filtro passado
-
-                    if(buscaID == 1){ // Caso o ID da busca (codEstacao) bater, não ficamos percorrendo os demais registro
-                        LiberarStringRegistro(&registroDados);
-                        break;
-                    }
-                }
-            } 
-
-            // Desaloco as strings alocadas pelo LerRegistroBIN
-            LiberarStringRegistro(&registroDados);
-        }
+        // Se for encontrado = 1
+        // Se NÃO for encontrado = 0
+        int encontrado = BuscaSequencial(arquivoBIN, cabecalho.proxRRN, criterios, m_nroCriterios);
 
         // Passei por todo o arquivo e a flag não se alterou, continuou 0, avisa o usuário que o registro não foi encontrado
-        if(registroEncontrado == 0){
+        if(encontrado == 0){
             MensagemRegistroNaoEncontrado();
         }
 
