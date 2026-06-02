@@ -299,20 +299,19 @@ void SelectWhereIndex(char *arquivoDados, char *arquivoIndex, int nroBuscas){
     FILE *arquivoDadosBIN = fopen(arquivoDados, "rb");
     if(arquivoDadosBIN == NULL){
         MensagemErro();
-        fclose(arquivoDadosBIN);
         return;
     }
 
     FILE *arquivoIndexBIN= fopen(arquivoIndex, "rb");
     if(arquivoIndexBIN == NULL){
         MensagemErro();
-        fclose(arquivoIndexBIN);
+        fclose(arquivoDadosBIN);
         return;
     }
 
     Header cabecalhoDados;
     LerCabecalhoBIN(arquivoDadosBIN, &cabecalhoDados);
-    if (cabecalhaDados.status == '0'){ // verificando consistência do arquivo
+    if (cabecalhoDados.status == '0'){ // verificando consistência do arquivo
         MensagemErro();
         fclose(arquivoDadosBIN);
         fclose(arquivoIndexBIN);
@@ -342,10 +341,10 @@ void SelectWhereIndex(char *arquivoDados, char *arquivoIndex, int nroBuscas){
 
         int usarIndice = 0;
         int valorCodEstacao = -1;
-        for(int criterioAtual = 0; c < m_nroCriterios; criterioAtual++){ // verificando se o id codEstacao está nos critérios
+        for(int criterioAtual = 0; criterioAtual < m_nroCriterios; criterioAtual++){ // verificando se o id codEstacao está nos critérios
             if(strcmp(criterios[criterioAtual].nomeDoCampo, "codEstacao") == 0 ){
                 usarIndice = 1;
-                valorCodEstacao = atoi(criteiros[criterioAtual].valorBuscado);
+                valorCodEstacao = atoi(criterios[criterioAtual].valorBuscado);
                 break;
             }
         }
@@ -390,7 +389,7 @@ void SelectWhereIndex(char *arquivoDados, char *arquivoIndex, int nroBuscas){
             registroEncontrado = BuscaSequencial(arquivoDadosBIN, cabecalhoDados.proxRRN, criterios, m_nroCriterios);
         }
 
-        if(registroEncontrado == 0) MensagemRegistroNaoEncontrado;
+        if(registroEncontrado == 0) MensagemRegistroNaoEncontrado();
         if(buscaAtual < nroBuscas - 1){
             printf("\n");
         }
