@@ -35,6 +35,8 @@
 
     void LiberarStringRegistro(Registro *registroDados);
 
+    int BuscaSequencial(FILE *arquivoBIN, int proxRRN, CriterioBusca *criterios, int nroCriterios);
+
     void LerCriteriosBusca(CriterioBusca *criterios, int qtdCriterios);
     int VerificaCriterioBusca(const Registro *registroDados, const char *nomeDoCampo, const char *valorBuscado);
 

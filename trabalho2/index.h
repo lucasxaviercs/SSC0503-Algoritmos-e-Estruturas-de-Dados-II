@@ -31,3 +31,6 @@
     void LerRegistroIndex(FILE *arquivoIndex, IndexRegistro *registro);
     // função auxiliar para escrever um registro da struct para o arquivo de índices
     void EscreverRegistroIndex(FILE *arquivoIndex, IndexRegistro *registro);
+
+    // realiza a leitura da estrutura de cabeçalho dos índices
+    void LerCabecalhoIndex(FILE *arquivoIndex, IndexHeader *cabecalhoIndex);

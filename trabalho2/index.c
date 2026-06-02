@@ -88,3 +88,8 @@ void EscreverRegistroIndex(FILE *arquivoIndex, IndexRegistro *registro) {
     fwrite(&registro->codEstacao, sizeof(int), 1, arquivoIndex);
     fwrite(&registro->RRN, sizeof(int), 1, arquivoIndex);
 }
+
+void LerCabecalhoIndex(FILE *arquivoIndex, IndexHeader *cabecalhoIndex){
+    fseek(arquivoIndex, 0, SEEK_SET);
+    fread(&cabecalhoIndex->status, sizeof(char), 1, arquivoIndex);
+}
